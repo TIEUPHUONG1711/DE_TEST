@@ -1,0 +1,10 @@
+pandas>=2.2,<3.0
+pyarrow>=16
+pytest>=8
+
+
+#   Vai trò:
+
+#   - pandas: profiling, transform và report.
+#   - pyarrow: ghi/đọc Parquet.
+#   - pytest: chạy automated tests, ktra tự động pipeline/fuction có chạy và cho kq đúng như mong đợi ko
