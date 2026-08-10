@@ -135,11 +135,31 @@ Run the pipeline from the repository root:
 python pipeline/src/pipeline.py
 ```
 
+### Business Analysis Results
+
+The report reads only `cleaned_logs.parquet` and `data_quality_report.json`, then writes `pipeline/results/analysis_results.json`.
+
+1. **Service with the most errors:** `payment-api` with **139** ERROR records.
+2. **Daily error anomaly:** `2026-07-30` with **140** ERROR records. The IQR upper bound is `42.75`, so this date is a high outlier.
+3. **Top three error types:**
+   - `ConnTimeout` — `payment-api`: 114
+   - `HTTP 502` — `web-portal`: 41
+   - `NullPointer` — `batch-report`: 37
+4. **Cleaning impact:** 66 dropped records and 18 fixed records. The detailed breakdown comes directly from the Data Quality Report.
+
+As a consistency check, grouping by service and grouping by UTC date both produce **287 total ERROR records**. The anomaly result is only a POC signal because seven days are too short for a production baseline or seasonality analysis.
+
+Run the business report after the pipeline:
+
+```powershell
+python pipeline/src/report.py
+```
+
 ### Ingestion, Profiling, Validation, and Cleaning Tests
 
 The focused tests cover ingest edge cases, the main profiling metrics, duplicate and timestamp rejection, the missing-level fix, source immutability, and raw/clean/dropped reconciliation.
 
-Current verified result: **12 focused tests passed**.
+Current verified result: **15 focused tests passed**.
 
 Run the tests from the repository root:
 

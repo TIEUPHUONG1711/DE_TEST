@@ -1,7 +1,96 @@
 {
-  "question_1": null,
-  "question_2": null,
-  "question_3": null,
-  "question_4": null,
-  "generated_at": null
+  "question_1": {
+    "service_with_most_errors": "payment-api",
+    "error_count": 139,
+    "service_ranking": [
+      {
+        "service": "payment-api",
+        "error_count": 139
+      },
+      {
+        "service": "web-portal",
+        "error_count": 41
+      },
+      {
+        "service": "batch-report",
+        "error_count": 37
+      },
+      {
+        "service": "auth-service",
+        "error_count": 35
+      },
+      {
+        "service": "notification-worker",
+        "error_count": 35
+      }
+    ]
+  },
+  "question_2": {
+    "daily_error_counts": {
+      "2026-07-27": 19,
+      "2026-07-28": 27,
+      "2026-07-29": 29,
+      "2026-07-30": 140,
+      "2026-07-31": 17,
+      "2026-08-01": 24,
+      "2026-08-02": 31
+    },
+    "anomaly_method": "IQR",
+    "iqr_details": {
+      "q1": 21.5,
+      "q3": 30.0,
+      "iqr": 8.5,
+      "lower_bound": 8.75,
+      "upper_bound": 42.75
+    },
+    "anomalies": [
+      {
+        "date": "2026-07-30",
+        "error_count": 140
+      }
+    ],
+    "limitation": "Only seven days are available; production anomaly detection needs a longer baseline and seasonality checks."
+  },
+  "question_3": {
+    "top_error_types": [
+      {
+        "error_type": "ConnTimeout",
+        "service": "payment-api",
+        "error_count": 114
+      },
+      {
+        "error_type": "HTTP 502",
+        "service": "web-portal",
+        "error_count": 41
+      },
+      {
+        "error_type": "NullPointer",
+        "service": "batch-report",
+        "error_count": 37
+      }
+    ]
+  },
+  "question_4": {
+    "raw_records": 2923,
+    "clean_records": 2857,
+    "dropped_records": 66,
+    "fixed_records": 18,
+    "rejection_breakdown": {
+      "exact_duplicate": 28,
+      "invalid_timestamp": 20,
+      "malformed_json": 18
+    },
+    "fix_breakdown": {
+      "missing_level_to_info": 18
+    },
+    "accounting_check": {
+      "expected_raw_count": 2923,
+      "passed": true
+    }
+  },
+  "verification": {
+    "total_error_records": 287,
+    "service_total_matches_daily_total": true
+  },
+  "generated_at": "2026-08-10T19:36:15.968732+00:00"
 }
