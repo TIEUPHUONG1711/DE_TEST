@@ -106,6 +106,8 @@ Dropped-record breakdown:
 
 All 18 fixed records had a missing `level` and the message `Heartbeat ok`; they were assigned `INFO`. The accounting check passes: `2,923 raw = 2,857 clean + 66 dropped`.
 
+The pipeline writes these metrics, the input checksum, accounting status, and representative rejected/fixed samples to `pipeline/results/data_quality_report.json`. This file is the single source for the cleaning statistics used by the business report.
+
 ### Transformation and Storage
 
 The 2,857 retained records are converted to a structured DataFrame with the following schema:
@@ -137,7 +139,7 @@ python pipeline/src/pipeline.py
 
 The focused tests cover ingest edge cases, the main profiling metrics, duplicate and timestamp rejection, the missing-level fix, source immutability, and raw/clean/dropped reconciliation.
 
-Current verified result: **11 focused tests passed**.
+Current verified result: **12 focused tests passed**.
 
 Run the tests from the repository root:
 

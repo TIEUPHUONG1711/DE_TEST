@@ -1,5 +1,82 @@
 {
-  "summary": {},
-  "validation_errors": [],
-  "generated_at": null
+  "raw_record_count": 2923,
+  "clean_record_count": 2857,
+  "dropped_record_count": 66,
+  "fixed_record_count": 18,
+  "unchanged_record_count": 2839,
+  "rejection_breakdown": {
+    "exact_duplicate": 28,
+    "invalid_timestamp": 20,
+    "malformed_json": 18
+  },
+  "fix_breakdown": {
+    "missing_level_to_info": 18
+  },
+  "accounting_check": {
+    "expected_raw_count": 2923,
+    "passed": true
+  },
+  "rejected_samples": [
+    {
+      "source_line_number": 39,
+      "issue": "malformed_json",
+      "detail": "Unterminated string starting at"
+    },
+    {
+      "source_line_number": 157,
+      "issue": "malformed_json",
+      "detail": "Unterminated string starting at"
+    },
+    {
+      "source_line_number": 290,
+      "issue": "malformed_json",
+      "detail": "Unterminated string starting at"
+    },
+    {
+      "source_line_number": 348,
+      "issue": "malformed_json",
+      "detail": "Expecting property name enclosed in double quotes"
+    },
+    {
+      "source_line_number": 402,
+      "issue": "malformed_json",
+      "detail": "Unterminated string starting at"
+    }
+  ],
+  "fixed_samples": [
+    {
+      "source_line_number": 11,
+      "fixes": [
+        "missing_level_to_info"
+      ]
+    },
+    {
+      "source_line_number": 96,
+      "fixes": [
+        "missing_level_to_info"
+      ]
+    },
+    {
+      "source_line_number": 216,
+      "fixes": [
+        "missing_level_to_info"
+      ]
+    },
+    {
+      "source_line_number": 304,
+      "fixes": [
+        "missing_level_to_info"
+      ]
+    },
+    {
+      "source_line_number": 705,
+      "fixes": [
+        "missing_level_to_info"
+      ]
+    }
+  ],
+  "input_file": "data/app_logs_7days.jsonl",
+  "input_sha256": "a2d2f83e980fbad70cf1ec31da9b3b33104910f206bc1bbf24dace57a718e821",
+  "parsed_record_count": 2905,
+  "generated_at": "2026-08-10T19:19:21.590560+00:00"
 }

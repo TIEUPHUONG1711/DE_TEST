@@ -4,7 +4,7 @@ import hashlib
 import json
 import re
 from collections import Counter
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -383,14 +383,33 @@ def transform_and_save(
     return dataframe
 
 
+def save_json(data: dict[str, Any], output_path: Path) -> None:
+    """Write a dictionary as readable UTF-8 JSON."""
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(
+        json.dumps(data, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+
 def main() -> None:
     input_path = Path("data/app_logs_7days.jsonl")
     output_path = Path("pipeline/output/cleaned_logs.parquet")
+    quality_report_path = Path("pipeline/results/data_quality_report.json")
     records, parse_errors, raw_line_count = ingest_jsonl(input_path)
     profile = profile_records(records, parse_errors, raw_line_count, input_path)
     cleaned_records, quality_report = validate_and_clean(
         records, parse_errors, raw_line_count
     )
+    quality_report.update(
+        {
+            "input_file": input_path.as_posix(),
+            "input_sha256": profile["input_sha256"],
+            "parsed_record_count": len(records),
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+        }
+    )
+    save_json(quality_report, quality_report_path)
     transformed_data = transform_and_save(cleaned_records, output_path)
 
     print("Profiling result:")
@@ -398,6 +417,7 @@ def main() -> None:
     print("\nCleaning result:")
     print(json.dumps(quality_report, indent=2, ensure_ascii=False))
     print(f"\nParquet written: {output_path}")
+    print(f"Quality report written: {quality_report_path}")
     print(f"Rows: {len(transformed_data)}, columns: {len(transformed_data.columns)}")
 
 

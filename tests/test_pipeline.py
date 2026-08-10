@@ -15,6 +15,7 @@ from pipeline import (
     extract_error_fields,
     ingest_jsonl,
     profile_records,
+    save_json,
     transform_and_save,
     validate_and_clean,
 )
@@ -210,3 +211,12 @@ def test_transform_writes_readable_parquet(tmp_path: Path) -> None:
     assert dataframe.loc[0, "error_type"] == "PaymentDeclined"
     assert dataframe.loc[0, "error_code"] == "51"
     assert pd.isna(dataframe.loc[1, "error_type"])
+
+
+def test_save_json_writes_readable_result(tmp_path: Path) -> None:
+    output_path = tmp_path / "result.json"
+    expected = {"clean_record_count": 2, "passed": True}
+
+    save_json(expected, output_path)
+
+    assert json.loads(output_path.read_text(encoding="utf-8")) == expected
