@@ -106,11 +106,38 @@ Dropped-record breakdown:
 
 All 18 fixed records had a missing `level` and the message `Heartbeat ok`; they were assigned `INFO`. The accounting check passes: `2,923 raw = 2,857 clean + 66 dropped`.
 
+### Transformation and Storage
+
+The 2,857 retained records are converted to a structured DataFrame with the following schema:
+
+| Column | Type | Description |
+|---|---|---|
+| `timestamp` | UTC datetime | Normalized event timestamp |
+| `event_date` | date | UTC date used for daily reporting |
+| `service` | string | Normalized service name |
+| `level` | string | `INFO`, `WARN`, or `ERROR` |
+| `message` | string | Original log message after safe trimming |
+| `request_id` | string | Request identifier |
+| `trace_id` | nullable string | Optional trace identifier |
+| `error_type` | nullable string | Stable type extracted from ERROR messages |
+| `error_code` | nullable string | HTTP or business error code when present |
+| `source_line_number` | integer | Original source line for auditability |
+
+`error_type` and `error_code` are extracted with a small deterministic regular expression. No LLM is used in the production cleaning path, and messages that do not match the known pattern receive `UNKNOWN` rather than a guessed type.
+
+The structured dataset is written to `pipeline/output/cleaned_logs.parquet`. Parquet was selected because it preserves datatypes, compresses columnar data efficiently, supports selective analytical reads, and integrates directly with pandas, AWS Glue, and Athena. The pipeline overwrites the same local output intentionally, then reads it back and verifies the row count.
+
+Run the pipeline from the repository root:
+
+```powershell
+python pipeline/src/pipeline.py
+```
+
 ### Ingestion, Profiling, Validation, and Cleaning Tests
 
 The focused tests cover ingest edge cases, the main profiling metrics, duplicate and timestamp rejection, the missing-level fix, source immutability, and raw/clean/dropped reconciliation.
 
-Current verified result: **7 focused tests passed**.
+Current verified result: **11 focused tests passed**.
 
 Run the tests from the repository root:
 

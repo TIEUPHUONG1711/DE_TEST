@@ -5,12 +5,19 @@ import sys
 from pathlib import Path
 
 import pytest
+import pandas as pd
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "pipeline" / "src"))
 
-from pipeline import ingest_jsonl, profile_records, validate_and_clean
+from pipeline import (
+    extract_error_fields,
+    ingest_jsonl,
+    profile_records,
+    transform_and_save,
+    validate_and_clean,
+)
 
 
 def test_ingest_keeps_good_lines_after_malformed_json(tmp_path: Path) -> None:
@@ -155,3 +162,51 @@ def test_cleaning_does_not_modify_source_record() -> None:
     assert cleaned[0]["service"] == "auth-service"
     assert cleaned[0]["level"] == "INFO"
     assert report["fixed_record_count"] == 1
+
+
+@pytest.mark.parametrize(
+    ("message", "level", "expected"),
+    [
+        ("ERR HTTP 502 upstream=payment-api", "ERROR", ("HTTP 502", "502")),
+        ("ERR PaymentDeclined txn=t1 code=51", "ERROR", ("PaymentDeclined", "51")),
+        ("Session created", "INFO", (None, None)),
+    ],
+)
+def test_extract_error_fields(
+    message: str, level: str, expected: tuple[str | None, str | None]
+) -> None:
+    assert extract_error_fields(message, level) == expected
+
+
+def test_transform_writes_readable_parquet(tmp_path: Path) -> None:
+    cleaned_records = [
+        {
+            "timestamp": "2026-07-27T07:00:00+07:00",
+            "service": "payment-api",
+            "level": "ERROR",
+            "message": "ERR PaymentDeclined txn=t1 code=51",
+            "request_id": "req-1",
+            "trace_id": None,
+            "source_line_number": 1,
+        },
+        {
+            "timestamp": "2026-07-27T01:00:00Z",
+            "service": "auth-service",
+            "level": "INFO",
+            "message": "Session created",
+            "request_id": "req-2",
+            "trace_id": "trace-2",
+            "source_line_number": 2,
+        },
+    ]
+    output_path = tmp_path / "cleaned.parquet"
+
+    dataframe = transform_and_save(cleaned_records, output_path)
+
+    assert output_path.is_file()
+    assert len(dataframe) == 2
+    assert str(dataframe["timestamp"].dtype) == "datetime64[ns, UTC]"
+    assert dataframe.loc[0, "event_date"].isoformat() == "2026-07-27"
+    assert dataframe.loc[0, "error_type"] == "PaymentDeclined"
+    assert dataframe.loc[0, "error_code"] == "51"
+    assert pd.isna(dataframe.loc[1, "error_type"])

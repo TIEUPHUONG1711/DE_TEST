@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import re
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
@@ -307,19 +308,97 @@ def validate_and_clean(
     return cleaned_records, report
 
 
+def extract_error_fields(message: str, level: str) -> tuple[str | None, str | None]:
+    """Extract a stable error type and optional code from an ERROR message."""
+    if level != "ERROR":
+        return None, None
+
+    type_match = re.match(r"^ERR\s+(HTTP\s+\d+|[A-Za-z]+)", message)
+    error_type = type_match.group(1) if type_match else "UNKNOWN"
+
+    code_match = re.search(r"\bcode=([A-Za-z0-9_-]+)", message)
+    if code_match:
+        error_code = code_match.group(1)
+    elif error_type.startswith("HTTP "):
+        error_code = error_type.split()[1]
+    else:
+        error_code = None
+
+    return error_type, error_code
+
+
+def transform_and_save(
+    cleaned_records: list[dict[str, Any]], output_path: Path
+) -> pd.DataFrame:
+    """Normalize the clean schema, write Parquet, and verify it can be read."""
+    dataframe = pd.DataFrame(cleaned_records)
+
+    dataframe["timestamp"] = pd.to_datetime(dataframe["timestamp"], utc=True)
+    dataframe["event_date"] = dataframe["timestamp"].dt.date
+
+    error_fields = [
+        extract_error_fields(message, level)
+        for message, level in zip(dataframe["message"], dataframe["level"])
+    ]
+    dataframe["error_type"] = pd.Series(
+        [value[0] for value in error_fields], dtype="string"
+    )
+    dataframe["error_code"] = pd.Series(
+        [value[1] for value in error_fields], dtype="string"
+    )
+
+    for field in ("service", "level", "message", "request_id", "trace_id"):
+        dataframe[field] = dataframe[field].astype("string")
+    dataframe["source_line_number"] = dataframe["source_line_number"].astype("int64")
+
+    column_order = [
+        "timestamp",
+        "event_date",
+        "service",
+        "level",
+        "message",
+        "request_id",
+        "trace_id",
+        "error_type",
+        "error_code",
+        "source_line_number",
+    ]
+    dataframe = dataframe[column_order]
+
+    if dataframe["timestamp"].isna().any():
+        raise ValueError("Clean data still contains invalid timestamps.")
+    duplicate_columns = [
+        column for column in column_order if column != "source_line_number"
+    ]
+    if dataframe.duplicated(subset=duplicate_columns).any():
+        raise ValueError("Clean data still contains duplicate records.")
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    dataframe.to_parquet(output_path, index=False, engine="pyarrow")
+
+    saved_dataframe = pd.read_parquet(output_path, engine="pyarrow")
+    if len(saved_dataframe) != len(dataframe):
+        raise ValueError("Parquet row count does not match the clean dataset.")
+
+    return dataframe
+
+
 def main() -> None:
     input_path = Path("data/app_logs_7days.jsonl")
+    output_path = Path("pipeline/output/cleaned_logs.parquet")
     records, parse_errors, raw_line_count = ingest_jsonl(input_path)
     profile = profile_records(records, parse_errors, raw_line_count, input_path)
     cleaned_records, quality_report = validate_and_clean(
         records, parse_errors, raw_line_count
     )
+    transformed_data = transform_and_save(cleaned_records, output_path)
 
     print("Profiling result:")
     print(json.dumps(profile, indent=2, ensure_ascii=False))
     print("\nCleaning result:")
     print(json.dumps(quality_report, indent=2, ensure_ascii=False))
-    print(f"\nClean records ready for transform: {len(cleaned_records)}")
+    print(f"\nParquet written: {output_path}")
+    print(f"Rows: {len(transformed_data)}, columns: {len(transformed_data.columns)}")
 
 
 if __name__ == "__main__":
