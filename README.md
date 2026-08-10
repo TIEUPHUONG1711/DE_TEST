@@ -159,10 +159,90 @@ python pipeline/src/report.py
 
 The focused tests cover ingest edge cases, the main profiling metrics, duplicate and timestamp rejection, the missing-level fix, source immutability, and raw/clean/dropped reconciliation.
 
-Current verified result: **15 focused tests passed**.
+Current verified result: **20 focused tests passed**, including the pipeline and KB tests.
 
 Run the tests from the repository root:
 
 ```powershell
 pytest -q
+```
+
+## Part B — Mini Knowledge Base
+
+### Knowledge Base Design
+
+The knowledge base is built from the eight Markdown documents in `kb/docs/`. The original files are kept unchanged so every retrieved chunk can be traced back to its source.
+
+Documents are split by level-two Markdown headings (`##`). Each section becomes one chunk. This structure-based strategy was selected because the supplied policies, SOPs, FAQ, guide, and runbook are already organized into meaningful sections. It keeps a procedure or policy rule together and is easier to explain than splitting at an arbitrary character count. A limitation is that very large sections would require a secondary size-based split in production.
+
+Each chunk contains:
+
+| Metadata | Purpose |
+|---|---|
+| `chunk_id` | Uniquely identifies the chunk |
+| `document_id` | Groups chunks from the same document/version |
+| `document_family` | Relates different versions of one policy |
+| `title` and `section` | Preserve document structure and retrieval context |
+| `version` | Supports version selection |
+| `effective_date` | Indicates when the document becomes applicable |
+| `owner` | Identifies the team responsible for the content |
+| `status` | Marks a version as `active` or `superseded` |
+| `source_path` | Provides traceability to the original document |
+| `content` | Stores the searchable section text |
+
+`kb/build_kb.py` produces 22 chunks from the eight documents: 20 active chunks and two superseded chunks. The chunks are saved to `kb/chunks.jsonl` for inspection and indexed in `kb/knowledge_base.db`.
+
+The search index uses SQLite FTS5 with the Unicode tokenizer. `title`, `section`, and `content` are searchable, while metadata remains available for filtering and citation. SQLite FTS5 was selected because the KB is small, must run locally without an API key, and benefits from deterministic, testable full-text search. `kb/search_kb.py` returns the top three active chunks ranked with BM25.
+
+Its main limitation is lexical matching: a question may use different terminology from the source. A small, documented query-expansion map handles the two observed differences in this POC. For a larger multilingual KB, embeddings or hybrid lexical/vector retrieval should be evaluated.
+
+Build and search the KB from the repository root:
+
+```powershell
+python kb/build_kb.py
+python kb/search_kb.py "sao lưu giữ bao lâu"
+```
+
+### Document Conflict and Version Handling
+
+The supplied documents contain a deliberate conflict between `POL-01 v1` and `POL-01 v2`. They specify different backup schedules, retention periods, storage approaches, and restore-approval rules. Version 2 states that it replaces version 1 and has the newer effective date.
+
+Both versions are retained for auditability, but their metadata differs:
+
+- `POL-01 v1` is marked `superseded`.
+- `POL-01 v2` is marked `active`.
+- Both belong to the same `POL-01` document family.
+- Search filters results with `status = 'active'`, so the superseded version cannot be used in normal answers.
+
+The version-trap evaluation question verifies this behavior: the KB retrieves `POL-01 v2` and answers with the current rules—backup at 23:30, retention for 30 days, and restore approval by the Head of Operations. The manual evaluation also confirms that v1 was not used.
+
+For a production update, the new document's owner, version, effective date, and replacement relationship must be validated before the previous active version is marked superseded. If these fields are missing or ambiguous, the document should not be published until the content owner confirms them.
+
+### Evaluation Set and Results
+
+The KB evaluation set contains 10 questions in `kb/eval_questions.json`. Each case records the question, expected answer, expected document and section, and explicit pass criteria. The set covers direct lookup, multi-source synthesis, a document-version trap, and an out-of-scope question.
+
+Retrieval is evaluated with **Hit@3**: a source-bearing question passes only when every expected document/section appears in the first three active chunks. Nine questions can be evaluated automatically; the out-of-scope question has no expected source and therefore requires manual review.
+
+| Metric | Result |
+|---|---:|
+| Total evaluation questions | 10 |
+| Automatically evaluated retrieval questions | 9 |
+| Retrieval questions passed | 9 |
+| Retrieval Hit@3 | 100% |
+
+The automated results are stored in `kb/eval_results.json`. Query expansion is intentionally limited to two terminology mappings found during evaluation: `chuyển` → `escalation` and `chạy lại` → `rerun`. This keeps the local lexical search understandable and deterministic while addressing terminology differences in the supplied documents.
+
+Three representative answers were also reviewed manually in `kb/manual_eval_results.md`:
+
+- **Q01 — Version correctness:** PASS. The answer uses active `POL-01 v2` and does not use superseded v1.
+- **Q05 — Multi-source synthesis:** PASS. The answer combines the restart limit from `SOP-01` with the escalation owner from `SOP-02`.
+- **Q10 — Out-of-scope refusal:** PASS. The answer states that salary, bonus, and leave information is absent instead of inventing a policy.
+
+This manual review checks groundedness in addition to retrieval: the answer must be supported by the retrieved sources, use the current document version, and avoid unsupported claims. A limitation is that three manually reviewed answers are a small sample; a production KB should evaluate more questions whenever documents or retrieval logic change.
+
+Run the complete retrieval evaluation from the repository root:
+
+```powershell
+python kb/evaluate.py
 ```

@@ -1,0 +1,393 @@
+{
+  "summary": {
+    "top_k": 3,
+    "evaluated_questions": 9,
+    "passed_questions": 9,
+    "retrieval_hit_rate": 1.0
+  },
+  "results": [
+    {
+      "id": "Q01",
+      "category": "version_trap",
+      "question": "Chính sách hiện hành quy định backup lúc mấy giờ, lưu bao lâu và khôi phục cần ai phê duyệt?",
+      "expected_answer": "Backup lúc 23:30, lưu giữ 30 ngày và phải có phê duyệt của Trưởng phòng Vận hành.",
+      "expected_sources": [
+        {
+          "document_id": "POL-01_v2",
+          "section": "Quy định"
+        }
+      ],
+      "pass_criteria": "Nêu đúng 23:30, 30 ngày, Trưởng phòng Vận hành; dùng POL-01 v2 và không dùng v1.",
+      "retrieval_pass": true,
+      "manual_answer_review_required": false,
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "document_id": "POL-01_v2",
+          "section": "Quy định",
+          "status": "active",
+          "score": -15.964412260039444
+        },
+        {
+          "rank": 2,
+          "document_id": "POL-01_v2",
+          "section": "Trách nhiệm",
+          "status": "active",
+          "score": -3.766169952625096
+        },
+        {
+          "rank": 3,
+          "document_id": "SOP-02",
+          "section": "Phân mức sự cố",
+          "status": "active",
+          "score": -3.2955431567767794
+        }
+      ]
+    },
+    {
+      "id": "Q02",
+      "category": "direct",
+      "question": "Lỗi ConnTimeout db-primary có nguyên nhân thường gặp và cách xử lý gì?",
+      "expected_answer": "Nguyên nhân thường gặp là database quá tải, hết connection pool hoặc lỗi mạng. Cần kiểm tra dashboard, không restart khi database quá tải và liên hệ DBA.",
+      "expected_sources": [
+        {
+          "document_id": "FAQ-01",
+          "section": "1. `ERR ConnTimeout db-primary`"
+        }
+      ],
+      "pass_criteria": "Nêu đúng nguyên nhân chính, không restart khi database quá tải và có dẫn nguồn FAQ-01.",
+      "retrieval_pass": true,
+      "manual_answer_review_required": false,
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "document_id": "FAQ-01",
+          "section": "1. `ERR ConnTimeout db-primary`",
+          "status": "active",
+          "score": -11.911252688403689
+        },
+        {
+          "rank": 2,
+          "document_id": "FAQ-01",
+          "section": "3. `ERR HTTP 502 upstream=payment-api`",
+          "status": "active",
+          "score": -5.480292750174995
+        },
+        {
+          "rank": 3,
+          "document_id": "FAQ-01",
+          "section": "4. `ERR NullPointer in ReportBuilder`",
+          "status": "active",
+          "score": -5.45764298157227
+        }
+      ]
+    },
+    {
+      "id": "Q03",
+      "category": "direct",
+      "question": "HTTP 502 upstream payment-api nên xử lý ở đâu?",
+      "expected_answer": "Đây thường là hệ quả của sự cố payment-api; cần xử lý nguyên nhân gốc tại payment-api trước, không xử lý ở web-portal.",
+      "expected_sources": [
+        {
+          "document_id": "FAQ-01",
+          "section": "3. `ERR HTTP 502 upstream=payment-api`"
+        }
+      ],
+      "pass_criteria": "Xác định đúng payment-api là nơi cần xử lý nguyên nhân gốc.",
+      "retrieval_pass": true,
+      "manual_answer_review_required": false,
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "document_id": "FAQ-01",
+          "section": "3. `ERR HTTP 502 upstream=payment-api`",
+          "status": "active",
+          "score": -15.957308143095933
+        },
+        {
+          "rank": 2,
+          "document_id": "FAQ-01",
+          "section": "4. `ERR NullPointer in ReportBuilder`",
+          "status": "active",
+          "score": -4.179069420021035
+        },
+        {
+          "rank": 3,
+          "document_id": "FAQ-01",
+          "section": "2. `ERR AuthTokenExpired`",
+          "status": "active",
+          "score": -3.3156985374627626
+        }
+      ]
+    },
+    {
+      "id": "Q04",
+      "category": "direct",
+      "question": "Trước khi restart payment-api cần kiểm tra điều gì?",
+      "expected_answer": "Phải kiểm tra queue giao dịch bằng 0 trước khi restart để tránh gây lệch số dư.",
+      "expected_sources": [
+        {
+          "document_id": "SOP-01",
+          "section": "Quy trình chuẩn (theo thứ tự, KHÔNG bỏ bước)"
+        }
+      ],
+      "pass_criteria": "Nêu đúng queue = 0 và rủi ro lệch số dư.",
+      "retrieval_pass": true,
+      "manual_answer_review_required": false,
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "document_id": "SOP-01",
+          "section": "Quy trình chuẩn (theo thứ tự, KHÔNG bỏ bước)",
+          "status": "active",
+          "score": -5.948447691654688
+        },
+        {
+          "rank": 2,
+          "document_id": "RUN-01",
+          "section": "Lịch chạy",
+          "status": "active",
+          "score": -4.35742106916283
+        },
+        {
+          "rank": 3,
+          "document_id": "FAQ-01",
+          "section": "3. `ERR HTTP 502 upstream=payment-api`",
+          "status": "active",
+          "score": -3.5610324198729693
+        }
+      ]
+    },
+    {
+      "id": "Q05",
+      "category": "multi_source",
+      "question": "Nếu restart dịch vụ hai lần vẫn lỗi thì cần làm gì và chuyển cho ai?",
+      "expected_answer": "Không restart quá hai lần. Sau lần thứ hai vẫn lỗi thì chuyển escalation mức 2 cho Kỹ sư hệ thống.",
+      "expected_sources": [
+        {
+          "document_id": "SOP-01",
+          "section": "Trường hợp restart KHÔNG giải quyết được"
+        },
+        {
+          "document_id": "SOP-02",
+          "section": "Luồng escalation"
+        }
+      ],
+      "pass_criteria": "Nêu đủ giới hạn hai lần và chuyển mức 2 cho Kỹ sư hệ thống.",
+      "retrieval_pass": true,
+      "manual_answer_review_required": false,
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "document_id": "SOP-01",
+          "section": "Trường hợp restart KHÔNG giải quyết được",
+          "status": "active",
+          "score": -12.28618327303393
+        },
+        {
+          "rank": 2,
+          "document_id": "FAQ-01",
+          "section": "1. `ERR ConnTimeout db-primary`",
+          "status": "active",
+          "score": -6.063703688660628
+        },
+        {
+          "rank": 3,
+          "document_id": "SOP-02",
+          "section": "Luồng escalation",
+          "status": "active",
+          "score": -5.2691763303747035
+        }
+      ]
+    },
+    {
+      "id": "Q06",
+      "category": "direct",
+      "question": "Sự cố P1 có thời hạn phản ứng bao lâu?",
+      "expected_answer": "Thời hạn phản ứng là 15 phút trong mọi khung giờ.",
+      "expected_sources": [
+        {
+          "document_id": "SOP-02",
+          "section": "Phân mức sự cố"
+        }
+      ],
+      "pass_criteria": "Nêu đúng 15 phút và áp dụng mọi khung giờ.",
+      "retrieval_pass": true,
+      "manual_answer_review_required": false,
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "document_id": "SOP-02",
+          "section": "Phân mức sự cố",
+          "status": "active",
+          "score": -9.903259727646159
+        },
+        {
+          "rank": 2,
+          "document_id": "SOP-02",
+          "section": "Luồng escalation",
+          "status": "active",
+          "score": -4.375751691393095
+        },
+        {
+          "rank": 3,
+          "document_id": "GUIDE-01",
+          "section": "Ngưỡng cảnh báo hiện hành",
+          "status": "active",
+          "score": -2.8871836240295954
+        }
+      ]
+    },
+    {
+      "id": "Q07",
+      "category": "multi_section",
+      "question": "Batch report chạy lúc nào và khi gặp NullPointer thì chạy lại như thế nào?",
+      "expected_answer": "Job chạy lúc 23:00. Khi lỗi cần kiểm tra dữ liệu đầu vào; nếu thiếu thì chờ bổ sung, sau đó rerun theo ngày và xác nhận báo cáo có khoảng 800–1.200 dòng.",
+      "expected_sources": [
+        {
+          "document_id": "RUN-01",
+          "section": "Lịch chạy"
+        },
+        {
+          "document_id": "RUN-01",
+          "section": "Khi job lỗi (`ERR NullPointer in ReportBuilder`)"
+        }
+      ],
+      "pass_criteria": "Nêu đúng 23:00, không rerun khi dữ liệu còn thiếu và kiểm tra 800–1.200 dòng.",
+      "retrieval_pass": true,
+      "manual_answer_review_required": false,
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "document_id": "RUN-01",
+          "section": "Lịch chạy",
+          "status": "active",
+          "score": -7.313797271792014
+        },
+        {
+          "rank": 2,
+          "document_id": "SOP-01",
+          "section": "Phạm vi",
+          "status": "active",
+          "score": -6.6672277874998755
+        },
+        {
+          "rank": 3,
+          "document_id": "RUN-01",
+          "section": "Khi job lỗi (`ERR NullPointer in ReportBuilder`)",
+          "status": "active",
+          "score": -6.205961630963393
+        }
+      ]
+    },
+    {
+      "id": "Q08",
+      "category": "direct",
+      "question": "Tỉ lệ ERROR bao nhiêu thì cảnh báo CRITICAL?",
+      "expected_answer": "Tỉ lệ ERROR trên tổng log trong 15 phút lớn hơn 5% thì cảnh báo CRITICAL.",
+      "expected_sources": [
+        {
+          "document_id": "GUIDE-01",
+          "section": "Ngưỡng cảnh báo hiện hành"
+        }
+      ],
+      "pass_criteria": "Nêu đúng lớn hơn 5% trong cửa sổ 15 phút.",
+      "retrieval_pass": true,
+      "manual_answer_review_required": false,
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "document_id": "GUIDE-01",
+          "section": "Ngưỡng cảnh báo hiện hành",
+          "status": "active",
+          "score": -11.653144384677793
+        },
+        {
+          "rank": 2,
+          "document_id": "GUIDE-01",
+          "section": "Dashboard chính",
+          "status": "active",
+          "score": -4.364326027084655
+        },
+        {
+          "rank": 3,
+          "document_id": "GUIDE-01",
+          "section": "Quy ước log",
+          "status": "active",
+          "score": -2.21276058288454
+        }
+      ]
+    },
+    {
+      "id": "Q09",
+      "category": "direct",
+      "question": "Đối tác POC có được truy cập production trực tiếp không?",
+      "expected_answer": "Không. Đối tác chỉ được dùng dữ liệu đã masking trong môi trường tách biệt và không kết nối production.",
+      "expected_sources": [
+        {
+          "document_id": "POL-02",
+          "section": "Với đối tác bên ngoài"
+        }
+      ],
+      "pass_criteria": "Từ chối truy cập production và nêu đúng masking cùng môi trường tách biệt.",
+      "retrieval_pass": true,
+      "manual_answer_review_required": false,
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "document_id": "POL-02",
+          "section": "Với đối tác bên ngoài",
+          "status": "active",
+          "score": -15.469374444634552
+        },
+        {
+          "rank": 2,
+          "document_id": "POL-02",
+          "section": "Quy định chung",
+          "status": "active",
+          "score": -9.854476124645247
+        },
+        {
+          "rank": 3,
+          "document_id": "GUIDE-01",
+          "section": "Dashboard chính",
+          "status": "active",
+          "score": -3.5626963798524827
+        }
+      ]
+    },
+    {
+      "id": "Q10",
+      "category": "out_of_scope",
+      "question": "Chính sách lương thưởng và ngày phép của nhân viên là gì?",
+      "expected_answer": "Không có thông tin trong knowledge base.",
+      "expected_sources": [],
+      "pass_criteria": "Phải nói không có thông tin; không được tự tạo chính sách lương thưởng hoặc ngày phép.",
+      "retrieval_pass": null,
+      "manual_answer_review_required": true,
+      "retrieved_chunks": [
+        {
+          "rank": 1,
+          "document_id": "POL-01_v2",
+          "section": "Trách nhiệm",
+          "status": "active",
+          "score": -4.0506897073965105
+        },
+        {
+          "rank": 2,
+          "document_id": "POL-02",
+          "section": "Quy định chung",
+          "status": "active",
+          "score": -3.0707598177660307
+        },
+        {
+          "rank": 3,
+          "document_id": "SOP-02",
+          "section": "Luồng escalation",
+          "status": "active",
+          "score": -3.0301824687678263
+        }
+      ]
+    }
+  ]
+}

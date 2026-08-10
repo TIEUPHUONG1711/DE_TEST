@@ -1,0 +1,135 @@
+[
+    {
+      "id": "Q01",
+      "category": "version_trap",
+      "question": "Chính sách hiện hành quy định backup lúc mấy giờ, lưu bao lâu và khôi phục cần ai phê duyệt?",
+      "expected_answer": "Backup lúc 23:30, lưu giữ 30 ngày và phải có phê duyệt của Trưởng phòng Vận hành.",
+      "expected_sources": [
+        {
+          "document_id": "POL-01_v2",
+          "section": "Quy định"
+        }
+      ],
+      "pass_criteria": "Nêu đúng 23:30, 30 ngày, Trưởng phòng Vận hành; dùng POL-01 v2 và không dùng v1."
+    },
+    {
+      "id": "Q02",
+      "category": "direct",
+      "question": "Lỗi ConnTimeout db-primary có nguyên nhân thường gặp và cách xử lý gì?",
+      "expected_answer": "Nguyên nhân thường gặp là database quá tải, hết connection pool hoặc lỗi mạng. Cần kiểm tra dashboard, không restart khi database quá tải và liên hệ DBA.",
+      "expected_sources": [
+        {
+          "document_id": "FAQ-01",
+          "section": "1. `ERR ConnTimeout db-primary`"
+        }
+      ],
+      "pass_criteria": "Nêu đúng nguyên nhân chính, không restart khi database quá tải và có dẫn nguồn FAQ-01."
+    },
+    {
+      "id": "Q03",
+      "category": "direct",
+      "question": "HTTP 502 upstream payment-api nên xử lý ở đâu?",
+      "expected_answer": "Đây thường là hệ quả của sự cố payment-api; cần xử lý nguyên nhân gốc tại payment-api trước, không xử lý ở web-portal.",
+      "expected_sources": [
+        {
+          "document_id": "FAQ-01",
+          "section": "3. `ERR HTTP 502 upstream=payment-api`"
+        }
+      ],
+      "pass_criteria": "Xác định đúng payment-api là nơi cần xử lý nguyên nhân gốc."
+    },
+    {
+      "id": "Q04",
+      "category": "direct",
+      "question": "Trước khi restart payment-api cần kiểm tra điều gì?",
+      "expected_answer": "Phải kiểm tra queue giao dịch bằng 0 trước khi restart để tránh gây lệch số dư.",
+      "expected_sources": [
+        {
+          "document_id": "SOP-01",
+          "section": "Quy trình chuẩn (theo thứ tự, KHÔNG bỏ bước)"
+        }
+      ],
+      "pass_criteria": "Nêu đúng queue = 0 và rủi ro lệch số dư."
+    },
+    {
+      "id": "Q05",
+      "category": "multi_source",
+      "question": "Nếu restart dịch vụ hai lần vẫn lỗi thì cần làm gì và chuyển cho ai?",
+      "expected_answer": "Không restart quá hai lần. Sau lần thứ hai vẫn lỗi thì chuyển escalation mức 2 cho Kỹ sư hệ thống.",
+      "expected_sources": [
+        {
+          "document_id": "SOP-01",
+          "section": "Trường hợp restart KHÔNG giải quyết được"
+        },
+        {
+          "document_id": "SOP-02",
+          "section": "Luồng escalation"
+        }
+      ],
+      "pass_criteria": "Nêu đủ giới hạn hai lần và chuyển mức 2 cho Kỹ sư hệ thống."
+    },
+    {
+      "id": "Q06",
+      "category": "direct",
+      "question": "Sự cố P1 có thời hạn phản ứng bao lâu?",
+      "expected_answer": "Thời hạn phản ứng là 15 phút trong mọi khung giờ.",
+      "expected_sources": [
+        {
+          "document_id": "SOP-02",
+          "section": "Phân mức sự cố"
+        }
+      ],
+      "pass_criteria": "Nêu đúng 15 phút và áp dụng mọi khung giờ."
+    },
+    {
+      "id": "Q07",
+      "category": "multi_section",
+      "question": "Batch report chạy lúc nào và khi gặp NullPointer thì chạy lại như thế nào?",
+      "expected_answer": "Job chạy lúc 23:00. Khi lỗi cần kiểm tra dữ liệu đầu vào; nếu thiếu thì chờ bổ sung, sau đó rerun theo ngày và xác nhận báo cáo có khoảng 800–1.200 dòng.",
+      "expected_sources": [
+        {
+          "document_id": "RUN-01",
+          "section": "Lịch chạy"
+        },
+        {
+          "document_id": "RUN-01",
+          "section": "Khi job lỗi (`ERR NullPointer in ReportBuilder`)"
+        }
+      ],
+      "pass_criteria": "Nêu đúng 23:00, không rerun khi dữ liệu còn thiếu và kiểm tra 800–1.200 dòng."
+    },
+    {
+      "id": "Q08",
+      "category": "direct",
+      "question": "Tỉ lệ ERROR bao nhiêu thì cảnh báo CRITICAL?",
+      "expected_answer": "Tỉ lệ ERROR trên tổng log trong 15 phút lớn hơn 5% thì cảnh báo CRITICAL.",
+      "expected_sources": [
+        {
+          "document_id": "GUIDE-01",
+          "section": "Ngưỡng cảnh báo hiện hành"
+        }
+      ],
+      "pass_criteria": "Nêu đúng lớn hơn 5% trong cửa sổ 15 phút."
+    },
+    {
+      "id": "Q09",
+      "category": "direct",
+      "question": "Đối tác POC có được truy cập production trực tiếp không?",
+      "expected_answer": "Không. Đối tác chỉ được dùng dữ liệu đã masking trong môi trường tách biệt và không kết nối production.",
+      "expected_sources": [
+        {
+          "document_id": "POL-02",
+          "section": "Với đối tác bên ngoài"
+        }
+      ],
+      "pass_criteria": "Từ chối truy cập production và nêu đúng masking cùng môi trường tách biệt."
+    },
+    {
+      "id": "Q10",
+      "category": "out_of_scope",
+      "question": "Chính sách lương thưởng và ngày phép của nhân viên là gì?",
+      "expected_answer": "Không có thông tin trong knowledge base.",
+      "expected_sources": [],
+      "pass_criteria": "Phải nói không có thông tin; không được tự tạo chính sách lương thưởng hoặc ngày phép."
+    }
+  ]

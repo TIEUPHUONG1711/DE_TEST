@@ -1,0 +1,82 @@
+[
+    {
+      "document_id": "FAQ-01",
+      "document_family": "FAQ-01",
+      "title": "Các lỗi thường gặp và cách xử lý",
+      "version": null,
+      "effective_date": "2026-07",
+      "owner": "Phòng CNTT",
+      "status": "active",
+      "source_path": "kb/docs/FAQ-01_loi_thuong_gap.md"
+    },
+    {
+      "document_id": "GUIDE-01",
+      "document_family": "GUIDE-01",
+      "title": "Hướng dẫn giám sát hệ thống",
+      "version": null,
+      "effective_date": "2026-06",
+      "owner": "Phòng CNTT",
+      "status": "active",
+      "source_path": "kb/docs/GUIDE-01_giam_sat_he_thong.md"
+    },
+    {
+      "document_id": "POL-01_v1",
+      "document_family": "POL-01",
+      "title": "Chính sách sao lưu dữ liệu",
+      "version": "1.0",
+      "effective_date": "2025-06",
+      "owner": "Phòng CNTT",
+      "status": "superseded",
+      "source_path": "kb/docs/POL-01_chinh_sach_backup_v1.md"
+    },
+    {
+      "document_id": "POL-01_v2",
+      "document_family": "POL-01",
+      "title": "Chính sách sao lưu dữ liệu",
+      "version": "2.0",
+      "effective_date": "2026-05",
+      "owner": "Phòng CNTT",
+      "status": "active",
+      "source_path": "kb/docs/POL-01_chinh_sach_backup_v2.md"
+    },
+    {
+      "document_id": "POL-02",
+      "document_family": "POL-02",
+      "title": "Chính sách truy cập hệ thống",
+      "version": "1.1",
+      "effective_date": "2026-02",
+      "owner": "Phòng CNTT",
+      "status": "active",
+      "source_path": "kb/docs/POL-02_chinh_sach_truy_cap.md"
+    },
+    {
+      "document_id": "RUN-01",
+      "document_family": "RUN-01",
+      "title": "Runbook job báo cáo cuối ngày",
+      "version": null,
+      "effective_date": "2026-05",
+      "owner": "Phòng CNTT",
+      "status": "active",
+      "source_path": "kb/docs/RUN-01_runbook_batch_report.md"
+    },
+    {
+      "document_id": "SOP-01",
+      "document_family": "SOP-01",
+      "title": "Quy trình khởi động lại dịch vụ",
+      "version": null,
+      "effective_date": "2026-03",
+      "owner": "Phòng CNTT",
+      "status": "active",
+      "source_path": "kb/docs/SOP-01_khoi_dong_lai_dich_vu.md"
+    },
+    {
+      "document_id": "SOP-02",
+      "document_family": "SOP-02",
+      "title": "Quy trình escalation sự cố",
+      "version": null,
+      "effective_date": "2026-04",
+      "owner": "Phòng CNTT",
+      "status": "active",
+      "source_path": "kb/docs/SOP-02_quy_trinh_escalation.md"
+    }
+  ]
