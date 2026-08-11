@@ -183,3 +183,17 @@ AI identified the six intended issues. Its initial draft was too long, used some
 
 **Verification and corrections**  
 I checked the AWS claims against the named S3 storage-class, DMS CDC, Athena columnar-format, and Lambda timeout pages. I checked chunking and version behavior against the supplied reading, `POL-01 v1/v2`, the 22-chunk build result, and the version-trap evaluation. I rewrote the RDS correction specifically for this assessment's daily-log workload and changed version selection to approved/active status, effective date, then version. The final review contains all six Problem/Correction/Source sections and is 477 words.
+
+## Entry 14 — Design and Trial a Verified Extraction Prompt
+
+**Task**  
+Design a prompt that converts free-text log messages to JSON, define expected outputs and evaluation metrics, and run the optional five-case LLM trial.
+
+**Prompt**  
+Asked AI to help define a fixed extraction schema, explicit no-guessing rules, five DataPack test cases including an ambiguous case, and a measurable evaluation strategy for approximately 3,000 messages.
+
+**Output and evaluation**  
+AI proposed a structured parser prompt and common quality metrics. I tightened the rules so missing evidence becomes null, component values are not duplicated in parameters, normalized fields follow a documented map, and `partial`/`failed` cases require review. I also added explicit POC thresholds rather than describing metrics without a pass gate.
+
+**Verification and corrections**  
+I confirmed all five messages exist in the supplied JSONL file and defined expected JSON before testing. I ran each case separately in ChatGPT with prompt v1, preserved the returned JSON values, and normalized only whitespace when recording them. All 5/5 outputs were valid JSON, schema compliant, semantic exact matches, and contained no observed unsupported values; the ambiguous `Clock sync failed` case correctly returned null fields with `partial` status. I recorded the tool, date, unknown model/settings, actual outputs, and results. I did not claim this small trial validates production performance; the 3,000-message strategy still requires a stratified human-reviewed gold set.

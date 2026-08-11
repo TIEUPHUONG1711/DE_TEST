@@ -78,5 +78,5 @@
   "input_file": "data/app_logs_7days.jsonl",
   "input_sha256": "a2d2f83e980fbad70cf1ec31da9b3b33104910f206bc1bbf24dace57a718e821",
   "parsed_record_count": 2905,
-  "generated_at": "2026-08-10T19:19:21.590560+00:00"
+  "generated_at": "2026-08-11T13:17:59.259296+00:00"
 }

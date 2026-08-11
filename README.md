@@ -2,6 +2,52 @@
 
 This repository contains the deliverables for the Data Engineer assessment, including a local data pipeline, a mini knowledge base, an AWS design, and the AI proficiency work log.
 
+## Setup and Reproduction
+
+Requirements: Python 3.11 and PowerShell. From the repository root:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+If PowerShell blocks virtual-environment activation, allow scripts only for the current shell and retry:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.venv\Scripts\Activate.ps1
+```
+
+Run the complete local workflow in this order:
+
+```powershell
+python pipeline/src/pipeline.py
+python pipeline/src/report.py
+python kb/build_kb.py
+python kb/evaluate.py
+pytest -q
+```
+
+All commands use repository-relative paths. The pipeline intentionally overwrites generated local outputs, so rerunning it does not append duplicate records.
+
+## Project Structure
+
+```text
+data/             Supplied raw JSONL input
+pipeline/src/     Ingestion, cleaning, transformation, and reporting code
+pipeline/output/  Generated clean Parquet dataset
+pipeline/results/ Generated data-quality and business reports
+kb/docs/          Supplied source documents for the knowledge base
+kb/               Chunking, SQLite FTS5 search, and KB evaluation artifacts
+design/           AWS architecture diagram and design explanation
+sop/              Knowledge Base update procedure
+ai_tasks/         AI-response review and verified prompt design
+tests/            Focused automated tests
+AI_WORKLOG.md     Verified record of meaningful AI usage
+```
+
 ## Part A — Data Pipeline
 
 ### Input Dataset
@@ -271,7 +317,19 @@ Run the complete retrieval evaluation from the repository root:
 python kb/evaluate.py
 ```
 
-## Part 2 — AI Proficiency
+### Knowledge Base Update SOP
+
+The update procedure is documented in [`sop/kb_update_sop.md`](sop/kb_update_sop.md). It defines the responsibilities of the Content Owner, Data Engineer, and Reviewer and covers document intake, metadata validation, version replacement, KB rebuilding, automated and manual evaluation, approval, publication, and rollback.
+
+The process runs whenever a new or revised document is received. Active documents should also be reviewed quarterly for freshness. A document is not published when ownership, version, effective date, evaluation, or approval is unresolved.
+
+## Assessment 2 — AI Proficiency
+
+### AI Work Log
+
+[`AI_WORKLOG.md`](AI_WORKLOG.md) contains 14 meaningful entries covering planning, implementation, debugging, verification, documentation, the AI-response review, and the verified prompt trial. Each entry records the task, summarized prompt, evaluation of the AI output, and the verification/corrections performed before using it.
+
+The log intentionally includes cases where AI output needed correction, such as the chunking test fixture, invalid evaluation JSON, incomplete retrieval results, over-broad AWS assumptions, and initial Task A wording. It does not claim that AI output was accepted without review.
 
 ### Task A — Review of an AI Response
 
@@ -279,4 +337,23 @@ The completed review is available in [`ai_tasks/task_a_ai_response_review.md`](a
 
 Each finding states the problem, a context-appropriate correction, and its verification source. Sources include named AWS documentation pages, the supplied chunking reading, the conflicting `POL-01` documents, and verified POC results. The review also distinguishes factual errors from the broader problem of presenting workload-dependent choices as universal rules.
 
-The review is 477 words and was intentionally kept within the assessment's one-page limit.
+The review contains 477 words and is intended to fit within the one-page limit when rendered. The rendered page length should be checked before final submission because Markdown itself has no fixed page size.
+
+### Task B — Verified Prompt Design
+
+The prompt, five predefined test cases, evaluation strategy, and optional LLM trial are documented in [`ai_tasks/task_b_prompt_design.md`](ai_tasks/task_b_prompt_design.md).
+
+The prompt acts as a deterministic log parser, returns a fixed JSON structure, uses `success`/`partial`/`failed` status, and requires null or empty values instead of unsupported guesses. The five test messages were selected from the DataPack, including the ambiguous message `Clock sync failed`; expected outputs were defined before the trial.
+
+The ChatGPT trial produced valid, schema-compliant JSON for all five cases. All five outputs matched the expected JSON semantically and contained no observed hallucinations. This is only a small demonstration, not production validation. The document separately defines a stratified gold set, field and parameter metrics, hallucination checks, human-review conditions, and proposed POC acceptance thresholds for evaluating approximately 3,000 messages.
+
+## Assumptions and Limitations
+
+- Assigning `INFO` to missing-level records with `Heartbeat ok` is a POC assumption that requires customer confirmation.
+- Reporting uses UTC. A production business timezone has not been confirmed.
+- IQR anomaly detection uses only seven days, so it does not model a longer baseline, trend, or seasonality.
+- The deterministic error parser covers patterns observed in the DataPack; unseen patterns may become `UNKNOWN` and require a rule update.
+- SQLite FTS5 is lexical search and may miss questions expressed with different terminology. The POC uses only two documented query expansions; a larger KB should evaluate hybrid/vector retrieval.
+- KB metadata, approval status, effective date, and version relationships are maintained manually in this POC.
+- The AWS architecture is a paper design only. It has not been deployed, benchmarked, or costed because file volume, trigger requirements, retention, SLA, and alert thresholds are unknown.
+- The five-case LLM trial is evidence that prompt v1 handles the selected cases, not evidence of production quality. The proposed gold-set evaluation has not been run on approximately 3,000 messages.
