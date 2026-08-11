@@ -169,3 +169,17 @@ AI added Quarantine, CloudWatch, IAM least privilege, encryption, and operationa
 
 **Verification and corrections**  
 I checked the design against the assessment scope and kept the main diagram simple. The final document clearly states that Lambda suits immediate file-arrival processing, while EventBridge could trigger Glue directly for one daily batch. It also states that volume, retention, cost, and alert thresholds require customer confirmation and that the design has not been deployed or benchmarked on AWS.
+
+## Entry 13 — Review a Misleading AI Architecture Answer
+
+**Task**  
+Review the deliberately flawed AI response in Task A and produce a source-backed document of no more than one page.
+
+**Prompt**  
+Asked AI to identify every incorrect or misleading claim, explain why it was unsafe, propose a correction, and name a verification source for each point.
+
+**Output and evaluation**  
+AI identified the six intended issues. Its initial draft was too long, used some generic source labels, treated S3 Raw plus batch Glue too broadly, and initially simplified policy authority to the newest version. These weaknesses repeated the same context problem being criticized in the source answer.
+
+**Verification and corrections**  
+I checked the AWS claims against the named S3 storage-class, DMS CDC, Athena columnar-format, and Lambda timeout pages. I checked chunking and version behavior against the supplied reading, `POL-01 v1/v2`, the 22-chunk build result, and the version-trap evaluation. I rewrote the RDS correction specifically for this assessment's daily-log workload and changed version selection to approved/active status, effective date, then version. The final review contains all six Problem/Correction/Source sections and is 477 words.

@@ -270,3 +270,13 @@ Run the complete retrieval evaluation from the repository root:
 ```powershell
 python kb/evaluate.py
 ```
+
+## Part 2 — AI Proficiency
+
+### Task A — Review of an AI Response
+
+The completed review is available in [`ai_tasks/task_a_ai_response_review.md`](ai_tasks/task_a_ai_response_review.md). It reviews six incorrect or misleading claims about S3 Standard-IA, Glue polling from production RDS, Parquet storage layout, Lambda runtime, fixed-size RAG chunks, and KB versioning.
+
+Each finding states the problem, a context-appropriate correction, and its verification source. Sources include named AWS documentation pages, the supplied chunking reading, the conflicting `POL-01` documents, and verified POC results. The review also distinguishes factual errors from the broader problem of presenting workload-dependent choices as universal rules.
+
+The review is 477 words and was intentionally kept within the assessment's one-page limit.
