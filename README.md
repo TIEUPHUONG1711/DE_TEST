@@ -155,6 +155,30 @@ Run the business report after the pipeline:
 python pipeline/src/report.py
 ```
 
+### AWS Daily Pipeline Design
+
+The proposed production design is documented in:
+
+- [`design/architecture.md`](design/architecture.md) — architecture diagram.
+- [`design/aws_design.md`](design/aws_design.md) — service choices, daily flow, IAM/security, and uncertainties.
+
+The main data flow is:
+
+```text
+Five internal systems
+→ S3 Raw
+→ Lambda
+→ Glue ETL
+→ S3 Quarantine / S3 Processed (Parquet)
+→ Glue Crawler and Data Catalog
+→ Athena
+→ Reports
+```
+
+S3 Raw preserves the source files for audit and reruns. Lambda receives a new-file event and starts Glue; Glue performs validation, cleaning, and transformation. Rejected-record details go to Quarantine, while clean Parquet goes to Processed. The Crawler publishes the schema to the Data Catalog, and Athena queries the processed dataset. CloudWatch monitoring, IAM least privilege, S3 Block Public Access, TLS, and encryption apply across the architecture.
+
+This is a paper design only; it has not been deployed or benchmarked on AWS. The main uncertainty is the required trigger model: Lambda is appropriate if processing must start when each file arrives, while EventBridge can start Glue directly for one scheduled daily batch. File volume, retention, cost, and alert thresholds also require customer confirmation.
+
 ### Ingestion, Profiling, Validation, and Cleaning Tests
 
 The focused tests cover ingest edge cases, the main profiling metrics, duplicate and timestamp rejection, the missing-level fix, source immutability, and raw/clean/dropped reconciliation.
